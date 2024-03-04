@@ -1,0 +1,11 @@
+# Jaw width defined in (m) unit
+float32 pos
+
+# Motion velocity defined in (m/s) unit
+float32 vel
+
+# Grip force defined in (N) unit
+float32 force
+---
+bool success
+string message
