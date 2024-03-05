@@ -5,7 +5,7 @@ from tf2_ros import TransformBroadcaster
 from sensor_msgs.msg import JointState
 from geometry_msgs.msg import TransformStamped
 from robotiq2f_interfaces.srv import Robotiq2FCmd, Robotiq2FInfo
-from .driver import Robotiq2F85Driver
+from .robotiq85_driver import Robotiq2F85Driver
 
 
 class bcolors:

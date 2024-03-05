@@ -4,7 +4,7 @@ from rclpy.node import Node
 from robotiq2f_interfaces.srv import Robotiq2FCmd, Robotiq2FInfo
 
 
-class OnrobotSGClient(Node):
+class GripperRequestClient(Node):
 
     def __init__(self):
         super().__init__("robotiq_gripper_client")
@@ -23,7 +23,7 @@ class OnrobotSGClient(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    clientNode = OnrobotSGClient()
+    clientNode = GripperRequestClient()
     pos = float(sys.argv[1])
     vel = float(sys.argv[2])
     force = float(sys.argv[3])

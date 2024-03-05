@@ -22,7 +22,8 @@ setup(
     license='TODO: License declaration',
     entry_points={
         'console_scripts': [
-        'robotiq_service = robotiq2f.server:main',
+        'robotiq85_service = robotiq2f.robotiq85_server:main',
+        'robotiqhande_service = robotiq2f.robotiqhande_server:main',
         'robotiq_client = robotiq2f.client:main',
         ],
     },

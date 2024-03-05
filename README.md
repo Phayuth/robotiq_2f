@@ -1,13 +1,24 @@
-# Robotiq 2F-85 Gripper ROS2
-ROS2 package for Robotiq 2F-85 Minimal Visualization with Real Hardware Control.
+# Robotiq Gripper ROS2
+ROS2 package for Robotiq Gripper for Minimal Visualization with Real Hardware Control. Featuring gripper :
+- Robotiq 85
+- Robotiq Hand-E
 
-## Dependencies
+Software architecture:
+
+`gripperio (for all gripper) -> driver (for each gripper) -> ROS2 server (for each gripper)`
+
+## Caution
+There will be some error in value due to conversion between signal value and real value that result from round off error, and round down in value.
+
+## Dependencies and Installation
 ```
 sudo pip3 install -U pymodbus
 sudo pip3 install pyserial
 ```
 1. Check usb port with `dmesg | egrep --color 'serial|tty'`
 2. Give permission to port with `sudo chmod a+rw /dev/ttyUSB1`
+
+Clone and build the pacakge as usual with `colcon build`
 
 ## Description
 - Gripper can be directly attach to robot (UR5e `tool0`) by publish `robot_state` in another topic instead of include in single `urdf` file.
@@ -16,22 +27,26 @@ sudo pip3 install pyserial
 - Mapping value from grip width to tip height since moving gripper will change it's grip location (important if an object is small).
 
 ## Usage
-### View as standalone test
-```
-ros2 launch robotiq2f_description view_gripper.launch.py
-```
+### View as fake hardware standalone test with joint state publisher gui
+
+- Robotiq 85 ```ros2 launch robotiq2f_description r85_view_gripper.launch.py```
+- Robotiq Hand-E ```ros2 launch robotiq2f_description rhande_view_gripper.launch.py```
+
 ### View with fake hardware and fake robot
 launch ur5e robot without rviz2 and then:
-```
-ros2 launch robotiq2f_description view_connect_to_ur.launch.py
-```
+- Robotiq 85 ```ros2 launch robotiq2f_description r85_view_connect_to_ur.launch.py```
+- Robotiq Hand-E ```ros2 ```
 
 ### View with real hardware
-```
-ros2 launch robotiq2f bringup_gripper.launch.py
-```
+- Robotiq 85 ```ros2 launch robotiq2f r85_bringup.launch.py```
+- Robotiq Hand-E ```ros2 launch robotiq2f rhande_bringup.launch.py ```
+
 Goto `rviz` panel and add another `robot_state` view and subscribe to `/gripper/robot_state`.
 
 ## Reference
+#### Robotiq 85
 - [Robotiq 2F Gripper Driver](https://github.com/KavrakiLab/robotiq_85_gripper)
 - [Robotiq PickNick](https://github.com/PickNikRobotics/robotiq_85_gripper)
+#### Robotiq Hand-E
+- [AcutronicRobotics](https://github.com/AcutronicRobotics/robotiq_modular_gripper)
+- [macs-lab](https://github.com/macs-lab/robotiq_hande_ros_driver)

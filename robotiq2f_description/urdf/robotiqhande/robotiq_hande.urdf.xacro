@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<robot name="robotiq_hande" xmlns:xacro="http://ros.org/wiki/xacro">
+	<xacro:include
+		filename="$(find robotiq2f_description)/urdf/robotiqhande/robotiq_hande_macro.urdf.xacro" />
+
+    <!-- base fixed link  -->
+	<link name="gripper_adapter_link">
+	</link>
+
+	<joint name="adapter_to_gripper_base" type="fixed">
+		<origin rpy="0 0 0" xyz="0 0 0" />
+		<parent link="gripper_adapter_link" />
+		<child link="hande_robotiq_hande_base_link" />
+	</joint>
+
+	<xacro:robotiq_hande prefix="hande_" />
+
+</robot>
