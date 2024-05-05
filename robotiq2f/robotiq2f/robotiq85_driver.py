@@ -122,39 +122,47 @@ class Robotiq2F85Driver:
         self.process_stat_cmd()
         return self._gripper.get_current()
 
-    def startup_routine(self):
+    def startup_routine(self, lowpower=False):
         """
         My lab gripper has a strange behaviour that I have to this sequence to activate properly.
-        Instead of just run activate gripper.
+        Instead of just run activate gripper. I know now, it's because I connect the power to low output wattage.
+        That is why it have this strange behavious. Connect direct to robot control box work fine.
 
         Run after the power-on 1 TIME ONLY.
         If run multiple time, the register will get cluter with incorrect bit.
         I don't know how to fix it since I don't understand any of this.
         """
         self.process_stat_cmd()
-        while self.is_ready() is False:
-            time.sleep(1)
-            print("Stage [1/5]")
+        if lowpower:
+            while self.is_ready() is False:
+                time.sleep(1)
+                print("Stage [1/5]")
+                self.deactivate_gripper()
+                time.sleep(1)
+
+                print("Stage [2/5]")
+                self.activate_gripper()
+                time.sleep(1)
+
+                print("Stage [3/5]")
+                self.deactivate_gripper()
+                time.sleep(1)
+
+                print("Stage [4/5]")
+                self._gripper.goto_raw(pos=255, vel=255, force=255)
+                time.sleep(5)
+
+                print("Stage [5/5]")
+                self._gripper.goto_raw(pos=0, vel=255, force=255)
+                time.sleep(5)
+
+                print("Stage [Done]")
+        else:
             self.deactivate_gripper()
             time.sleep(1)
 
-            print("Stage [2/5]")
             self.activate_gripper()
             time.sleep(1)
-
-            print("Stage [3/5]")
-            self.deactivate_gripper()
-            time.sleep(1)
-
-            print("Stage [4/5]")
-            self._gripper.goto_raw(pos=255)
-            time.sleep(5)
-
-            print("Stage [5/5]")
-            self._gripper.goto_raw(pos=0)
-            time.sleep(5)
-
-            print("Stage [Done]")
 
 
 if __name__ == "__main__":

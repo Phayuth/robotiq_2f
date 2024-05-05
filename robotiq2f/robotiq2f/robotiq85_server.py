@@ -26,7 +26,7 @@ class Robotiq2FServer(Node):
         super().__init__("robotiq_griper_server")
         self.get_logger().info(bcolors.OKGREEN + "Setting Up Connection" + bcolors.ENDC)
         self.gripper = Robotiq2F85Driver()
-        self.gripper.startup_routine()
+        self.gripper.startup_routine(lowpower=False)
 
         self.getInfoSrv = self.create_service(Robotiq2FInfo, "/gripper_info", self.get_info_cb)
         self.cmdSrv = self.create_service(Robotiq2FCmd, "/gripper_command", self.cmd_cb)
