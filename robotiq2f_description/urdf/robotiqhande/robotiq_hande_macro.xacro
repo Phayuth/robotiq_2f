@@ -1,6 +1,14 @@
 <?xml version="1.0"?>
 <robot xmlns:xacro="http://ros.org/wiki/xacro">
-	<xacro:macro name="robotiq_hande" params="prefix">
+
+	<xacro:macro name="robotiq_hande" params="prefix parent *origin">
+
+		<joint name="${prefix}robotiq_hande_base_joint" type="fixed">
+			<parent link="${parent}" />
+			<child link="${prefix}robotiq_hande_base_link" />
+			<xacro:insert_block name="origin" />
+		</joint>
+
 		<link name="${prefix}robotiq_hande_base_link">
 			<inertial>
 				<origin xyz="0 0 0.04607" rpy="0 0 0" />
@@ -11,7 +19,8 @@
 			<visual>
 				<origin xyz="0 0 0" rpy="0 0 0" />
 				<geometry>
-					<mesh filename="package://robotiq2f_description/meshes/robotiqhande/visual/hand-e.dae"
+					<mesh
+						filename="package://robotiq2f_description/meshes/robotiqhande/visual/hand-e.dae"
 						scale="0.001 0.001 0.001" />
 				</geometry>
 				<material name="Gazebo/Black">
@@ -21,7 +30,8 @@
 			<collision>
 				<origin xyz="0 0 0" rpy="0 0 0" />
 				<geometry>
-					<mesh filename="package://robotiq2f_description/meshes/robotiqhande/visual/hand-e.dae"
+					<mesh
+						filename="package://robotiq2f_description/meshes/robotiqhande/visual/hand-e.dae"
 						scale="0.001 0.001 0.001" />
 				</geometry>
 			</collision>
@@ -37,7 +47,8 @@
 			<visual>
 				<origin rpy="0 0 0" xyz="0 0 0" />
 				<geometry>
-					<mesh filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_1.dae"
+					<mesh
+						filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_1.dae"
 						scale="0.001 0.001 0.001" />
 				</geometry>
 				<material name="Gazebo/Grey">
@@ -47,7 +58,8 @@
 			<collision>
 				<origin rpy="0 0 0" xyz="0 0 0" />
 				<geometry>
-					<mesh filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_1.dae"
+					<mesh
+						filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_1.dae"
 						scale="0.001 0.001 0.001" />
 				</geometry>
 			</collision>
@@ -63,7 +75,8 @@
 			<visual>
 				<origin rpy="0 0 0" xyz="0 0 0" />
 				<geometry>
-					<mesh filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_2.dae"
+					<mesh
+						filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_2.dae"
 						scale="0.001 0.001 0.001" />
 				</geometry>
 				<material name="Gazebo/Grey">
@@ -73,7 +86,8 @@
 			<collision>
 				<origin rpy="0 0 0" xyz="0 0 0" />
 				<geometry>
-					<mesh filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_2.dae"
+					<mesh
+						filename="package://robotiq2f_description/meshes/robotiqhande/visual/finger_2.dae"
 						scale="0.001 0.001 0.001" />
 				</geometry>
 			</collision>

@@ -41,7 +41,7 @@ launch ur5e robot without rviz2 and then:
 - Robotiq 85 ```ros2 launch robotiq2f r85_bringup.launch.py```
 - Robotiq Hand-E ```ros2 launch robotiq2f rhande_bringup.launch.py ```
 
-Goto `rviz` panel and add another `robot_state` view and subscribe to `/gripper/robot_state`.
+Goto `rviz` panel and add another `robot_state` view and subscribe to `/robot_state`.
 
 ## Reference
 #### Robotiq 85

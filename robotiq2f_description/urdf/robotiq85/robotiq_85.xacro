@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<robot name="robotiq_85_gripper" xmlns:xacro="http://ros.org/wiki/xacro">
+    <link name="world" />
+    <!-- defined parameters -->
+    <xacro:arg name="prefix" default="" />
+    <xacro:arg name="connected_to" default="world" />
+    <xacro:arg name="rotation" default="0.0" />
+    <xacro:arg name="use_fake_hardware" default="true" />
+
+    <!-- include wrist adapter -->
+    <xacro:include
+        filename="$(find robotiq2f_description)/urdf/robotiq85/ur_to_robotiq_adapter.xacro" />
+    <xacro:ur_to_robotiq prefix="$(arg prefix)" connected_to="$(arg connected_to)"
+        rotation="$(arg rotation)" />
+
+    <!-- include gripper -->
+    <xacro:include
+        filename="$(find robotiq2f_description)/urdf/robotiq85/robotiq_85_macro.xacro" />
+    <xacro:robotiq_85_gripper prefix="$(arg prefix)" parent="$(arg prefix)gripper_mount_link">
+        <origin xyz="0 0 0" rpy="0 0 0" />
+    </xacro:robotiq_85_gripper>
+
+    <!-- include ros2_control -->
+    <xacro:include
+        filename="$(find robotiq2f_description)/urdf/robotiq85/robotiq_85.ros2_control.xacro" />
+    <xacro:robotiq_85_control prefix="$(arg prefix)" use_fake_hardware="$(arg use_fake_hardware)" />
+
+</robot>

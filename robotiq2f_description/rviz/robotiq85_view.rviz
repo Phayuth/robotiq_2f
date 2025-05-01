@@ -69,7 +69,7 @@ Visualization Manager:
         Durability Policy: Volatile
         History Policy: Keep Last
         Reliability Policy: Reliable
-        Value: /gripper/robot_description
+        Value: /robot_description
       Enabled: true
       Links:
         All Links Enabled: true
@@ -77,7 +77,7 @@ Visualization Manager:
         Expand Link Details: false
         Expand Tree: false
         Link Tree Style: Links in Alphabetic Order
-        gripper_adapter_link:
+        gripper_mount_link:
           Alpha: 1
           Show Axes: false
           Show Trail: false
@@ -126,6 +126,23 @@ Visualization Manager:
           Show Axes: false
           Show Trail: false
           Value: true
+        robotiq_85_tip:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        ur_to_robotiq_link:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+          Value: true
+        world:
+          Alpha: 1
+          Show Axes: false
+          Show Trail: false
+      Mass Properties:
+        Inertia: false
+        Mass: false
       Name: RobotModel
       TF Prefix: ""
       Update Interval: 0
@@ -146,6 +163,9 @@ Visualization Manager:
     - Class: rviz_default_plugins/Measure
       Line color: 128; 128; 0
     - Class: rviz_default_plugins/SetInitialPose
+      Covariance x: 0.25
+      Covariance y: 0.25
+      Covariance yaw: 0.06853891909122467
       Topic:
         Depth: 5
         Durability Policy: Volatile
@@ -208,5 +228,5 @@ Window Geometry:
   Views:
     collapsed: false
   Width: 1609
-  X: 226
-  Y: 27
+  X: 204
+  Y: 1080

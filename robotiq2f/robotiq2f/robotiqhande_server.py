@@ -33,7 +33,7 @@ class RobotiqHandEServer(Node):
 
         self.tfbroadcaster = TransformBroadcaster(self)
         self.timer = self.create_timer(0.01, self.gripper_state_handle)
-        self.gjsPub = self.create_publisher(JointState, "/gripper/joint_states", 10)
+        self.gjsPub = self.create_publisher(JointState, "/joint_states", 10)
 
         self.get_logger().info(f"Grip Width : [0, 0.050] (m)")
         self.get_logger().info(f"Grip Velo  : [0.020, 0.150] (m/s)")

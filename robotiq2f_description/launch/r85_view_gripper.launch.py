@@ -7,22 +7,22 @@ from ament_index_python.packages import get_package_share_directory
 
 def generate_launch_description():
 
-    robot_description_config = xacro.process_file(os.path.join(get_package_share_directory("robotiq2f_description"), "urdf", "robotiq85", "robotiq_85.urdf.xacro"))
+    robot_description_config = xacro.process_file(os.path.join(get_package_share_directory("robotiq2f_description"), "urdf", "robotiq85", "robotiq_85.xacro"))
     robot_description = {"robot_description": robot_description_config.toxml()}
 
     joint_state_pub_gui_node = Node(
         package="joint_state_publisher_gui",
         executable="joint_state_publisher_gui",
         name="joint_state_publisher_gui",
-        namespace="gripper",
-        parameters=[robot_description])
+        parameters=[robot_description],
+    )
 
     robot_state_pub_node = Node(
         package="robot_state_publisher",
         executable="robot_state_publisher",
-        namespace="gripper",
         output="screen",
-        parameters=[robot_description])
+        parameters=[robot_description],
+    )
 
     rviz_node = Node(
         package="rviz2",
@@ -30,6 +30,13 @@ def generate_launch_description():
         name="rviz2",
         output="log",
         arguments=["-d", os.path.join(get_package_share_directory("robotiq2f_description"), "rviz", "robotiq85_view.rviz")],
-        parameters=[robot_description])
+        parameters=[robot_description],
+    )
 
-    return LaunchDescription([rviz_node, robot_state_pub_node, joint_state_pub_gui_node])
+    return LaunchDescription(
+        [
+            rviz_node,
+            robot_state_pub_node,
+            joint_state_pub_gui_node,
+        ]
+    )
