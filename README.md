@@ -32,11 +32,6 @@ Clone and build the pacakge as usual with `colcon build`
 - Robotiq 85 ```ros2 launch robotiq2f_description r85_view_gripper.launch.py```
 - Robotiq Hand-E ```ros2 launch robotiq2f_description rhande_view_gripper.launch.py```
 
-### View with fake hardware and fake robot
-launch ur5e robot without rviz2 and then:
-- Robotiq 85 ```ros2 launch robotiq2f_description r85_view_connect_to_ur.launch.py```
-- Robotiq Hand-E ```ros2 ```
-
 ### View with real hardware
 - Robotiq 85 ```ros2 launch robotiq2f r85_bringup.launch.py```
 - Robotiq Hand-E ```ros2 launch robotiq2f rhande_bringup.launch.py ```

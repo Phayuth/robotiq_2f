@@ -24,8 +24,12 @@ class RobotiqHandEServer(Node):
 
     def __init__(self):
         super().__init__("robotiq_griper_server")
+
+        self.declare_parameter("comport", "/dev/ttyUSB0")
+        self.declare_parameter("baud", 115200)
+
         self.get_logger().info(bcolors.OKGREEN + "Setting Up Connection" + bcolors.ENDC)
-        self.gripper = RobotiqHandEDriver()
+        self.gripper = RobotiqHandEDriver(self.get_parameter("comport").value, self.get_parameter("baud").value)
         self.gripper.startup_routine()
 
         self.getInfoSrv = self.create_service(Robotiq2FInfo, "/gripper_info", self.get_info_cb)
@@ -65,7 +69,7 @@ class RobotiqHandEServer(Node):
         return response
 
     def joint_from_pos(self, pos):
-        return np.clip(0.025 - (pos/2.0), 0., 0.025)
+        return np.clip(0.025 - (pos / 2.0), 0.0, 0.025)
 
     def gripper_state_handle(self):
         time = self.get_clock().now().to_msg()

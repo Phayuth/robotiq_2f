@@ -1,17 +1,12 @@
-import subprocess
 import time
 import serial
 from .modbus_crc import verify_modbus_rtu_crc
 from .gripperio import GripperIO
 
-s = subprocess.getstatusoutput("dmesg | grep -i FTDI | tail -n 1 | grep -oP 'ttyUSB\K\d+'")
-usbid = s[1]
-subprocess.getstatusoutput("sudo chmod a+rw /dev/ttyUSB" + usbid)
-
 
 class Robotiq2F85Driver:
 
-    def __init__(self, comport="/dev/ttyUSB" + usbid, baud=115200):
+    def __init__(self, comport="/dev/ttyUSB", baud=115200):
         try:
             self.ser = serial.Serial(comport, baud, timeout=0.2)
         except:
@@ -122,53 +117,9 @@ class Robotiq2F85Driver:
         self.process_stat_cmd()
         return self._gripper.get_current()
 
-    def startup_routine(self, lowpower=False):
-        """
-        My lab gripper has a strange behaviour that I have to this sequence to activate properly.
-        Instead of just run activate gripper. I know now, it's because I connect the power to low output wattage.
-        That is why it have this strange behavious. Connect direct to robot control box work fine.
+    def startup_routine(self):
+        self.deactivate_gripper()
+        time.sleep(1)
 
-        Run after the power-on 1 TIME ONLY.
-        If run multiple time, the register will get cluter with incorrect bit.
-        I don't know how to fix it since I don't understand any of this.
-        """
-        self.process_stat_cmd()
-        if lowpower:
-            while self.is_ready() is False:
-                time.sleep(1)
-                print("Stage [1/5]")
-                self.deactivate_gripper()
-                time.sleep(1)
-
-                print("Stage [2/5]")
-                self.activate_gripper()
-                time.sleep(1)
-
-                print("Stage [3/5]")
-                self.deactivate_gripper()
-                time.sleep(1)
-
-                print("Stage [4/5]")
-                self._gripper.goto_raw(pos=255, vel=255, force=255)
-                time.sleep(5)
-
-                print("Stage [5/5]")
-                self._gripper.goto_raw(pos=0, vel=255, force=255)
-                time.sleep(5)
-
-                print("Stage [Done]")
-        else:
-            self.deactivate_gripper()
-            time.sleep(1)
-
-            self.activate_gripper()
-            time.sleep(1)
-
-
-if __name__ == "__main__":
-    g = Robotiq2F85Driver()
-    g.startup_routine()
-    g.goto(0.085, 0.020, 40.0)
-    time.sleep(2)
-    g.goto(0.000, 0.020, 40.0)
-    print("End File")
+        self.activate_gripper()
+        time.sleep(1)

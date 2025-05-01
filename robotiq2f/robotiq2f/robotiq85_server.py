@@ -24,9 +24,13 @@ class Robotiq2FServer(Node):
 
     def __init__(self):
         super().__init__("robotiq_griper_server")
+
+        self.declare_parameter("comport", "/dev/ttyUSB0")
+        self.declare_parameter("baud", 115200)
+
         self.get_logger().info(bcolors.OKGREEN + "Setting Up Connection" + bcolors.ENDC)
-        self.gripper = Robotiq2F85Driver()
-        self.gripper.startup_routine(lowpower=False)
+        self.gripper = Robotiq2F85Driver(self.get_parameter("comport").value, self.get_parameter("baud").value)
+        self.gripper.startup_routine()
 
         self.getInfoSrv = self.create_service(Robotiq2FInfo, "/gripper_info", self.get_info_cb)
         self.cmdSrv = self.create_service(Robotiq2FCmd, "/gripper_command", self.cmd_cb)
@@ -68,11 +72,11 @@ class Robotiq2FServer(Node):
         return (x - inMin) * (outMax - outMin) / (inMax - inMin) + outMin
 
     def tcpz_from_pos(self, pos, tipdownOffset=0.0):
-        z = self.map_val(pos, 0.085, 0.0, 0.1493, 0.1628) # physical mapping from grip width to tip height
+        z = self.map_val(pos, 0.085, 0.0, 0.1493, 0.1628)  # physical mapping from grip width to tip height
         return z - np.clip(tipdownOffset, 0.0, 0.038)
 
     def joint_from_pos(self, pos):
-        return np.clip(0.8 - ((0.8/0.085) * pos), 0., 0.8)
+        return np.clip(0.8 - ((0.8 / 0.085) * pos), 0.0, 0.8)
 
     def gripper_state_handle(self):
         time = self.get_clock().now().to_msg()

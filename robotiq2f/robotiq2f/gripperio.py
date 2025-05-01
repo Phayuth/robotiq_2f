@@ -1,5 +1,4 @@
 import array
-import numpy as np
 from .modbus_crc import compute_modbus_rtu_crc, verify_modbus_rtu_crc
 
 
@@ -9,25 +8,25 @@ class SignalValueConverter:
     - lerp = linear interpolation
     - rlerp = reverse linear interpolation
 
-    Return value is clamp to avoid over physical limit with `np.clip`
+    Return value is clamped to avoid over physical limit using min and max.
 
     """
 
     def conv_signal_to_real_lerp(signal, realmin, realmax):
-        real = realmin + signal * ((realmax - realmin) / 255)  # simplified pre-calculated.
-        return np.clip(real, realmin, realmax)
+        real = realmin + signal * ((realmax - realmin) / 255)
+        return max(realmin, min(real, realmax))
 
     def conv_real_to_signal_lerp(real, realmin, realmax):
         signal = (real - realmin) * (255 / (realmax - realmin))
-        return int(np.clip(signal, 0, 255))
+        return int(max(0, min(signal, 255)))
 
     def conv_signal_to_real_rlerp(signal, realmin, realmax):
         real = realmin + (signal - 255) * ((realmax - realmin) / (-255))
-        return np.clip(real, realmin, realmax)
+        return max(realmin, min(real, realmax))
 
     def conv_real_to_signal_rlerp(real, realmin, realmax):
-        signal = (real - realmax) * ((255) / (realmin - realmax))
-        return int(np.clip(signal, 0, 255))
+        signal = (real - realmax) * (255 / (realmin - realmax))
+        return int(max(0, min(signal, 255)))
 
 
 class GripperIO:

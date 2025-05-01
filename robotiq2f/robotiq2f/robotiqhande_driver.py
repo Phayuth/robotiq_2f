@@ -1,17 +1,12 @@
-import subprocess
 import time
 import serial
 from .modbus_crc import verify_modbus_rtu_crc
 from .gripperio import GripperIO
 
-s = subprocess.getstatusoutput("dmesg | grep -i FTDI | tail -n 1 | grep -oP 'ttyUSB\K\d+'")
-usbid = s[1]
-subprocess.getstatusoutput("sudo chmod a+rw /dev/ttyUSB" + usbid)
-
 
 class RobotiqHandEDriver:
 
-    def __init__(self, comport="/dev/ttyUSB" + usbid, baud=115200):
+    def __init__(self, comport="/dev/ttyUSB0", baud=115200):
         try:
             self.ser = serial.Serial(comport, baud, timeout=0.2)
         except:
@@ -123,25 +118,8 @@ class RobotiqHandEDriver:
         return self._gripper.get_current()
 
     def startup_routine(self):
-        self.process_stat_cmd()
-        while self.is_ready() is False:
+        self.deactivate_gripper()
+        time.sleep(1)
 
-            time.sleep(1)
-            print("Stage [1/2]")
-            self.deactivate_gripper()
-            time.sleep(1)
-
-            print("Stage [2/2]")
-            self.activate_gripper()
-            time.sleep(4)
-
-            print("Stage [Done]")
-
-
-if __name__ == "__main__":
-    g = RobotiqHandEDriver()
-    g.startup_routine()
-    g.goto(0.05, 0.02, 60.0)
-    time.sleep(2)
-    g.goto(0.00, 0.075, 100.0)
-    print("End File")
+        self.activate_gripper()
+        time.sleep(1)
