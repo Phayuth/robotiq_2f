@@ -11,8 +11,7 @@ Software architecture:
 There will be some error in value due to conversion between signal value and real value that result from round off error, and round down in value.
 
 ## Dependencies and Installation
-```
-sudo pip3 install -U pymodbus
+```bash
 sudo pip3 install pyserial
 ```
 1. Check usb port with `dmesg | egrep --color 'serial|tty'`

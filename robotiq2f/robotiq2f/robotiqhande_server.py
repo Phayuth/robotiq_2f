@@ -1,9 +1,7 @@
 import numpy as np
 import rclpy
 from rclpy.node import Node
-from tf2_ros import TransformBroadcaster
 from sensor_msgs.msg import JointState
-from geometry_msgs.msg import TransformStamped
 from robotiq2f_interfaces.srv import Robotiq2FCmd, Robotiq2FInfo
 from .robotiqhande_driver import RobotiqHandEDriver
 
@@ -24,18 +22,30 @@ class RobotiqHandEServer(Node):
 
     def __init__(self):
         super().__init__("robotiq_griper_server")
-
+        # parameters
         self.declare_parameter("comport", "/dev/ttyUSB0")
         self.declare_parameter("baud", 115200)
+        self.declare_parameter("use_fake_hardware", False)
+        self.comport = self.get_parameter("comport").value
+        self.baud = self.get_parameter("baud").value
+        self.use_fake_hardware = self.get_parameter("use_fake_hardware").value
 
+        # setup
         self.get_logger().info(bcolors.OKGREEN + "Setting Up Connection" + bcolors.ENDC)
-        self.gripper = RobotiqHandEDriver(self.get_parameter("comport").value, self.get_parameter("baud").value)
-        self.gripper.startup_routine()
+        if not self.use_fake_hardware:
+            self.gripper = RobotiqHandEDriver(self.comport, self.baud)
+            self.gripper.startup_routine()
 
-        self.getInfoSrv = self.create_service(Robotiq2FInfo, "/gripper_info", self.get_info_cb)
-        self.cmdSrv = self.create_service(Robotiq2FCmd, "/gripper_command", self.cmd_cb)
+        if not self.use_fake_hardware:
+            server_callback = self.server_callback
+            info_callback = self.info_callback
+        else:
+            server_callback = self.server_fake_callback
+            info_callback = self.info_fake_callback
 
-        self.tfbroadcaster = TransformBroadcaster(self)
+        self.cmdSrv = self.create_service(Robotiq2FCmd, "/gripper_command", server_callback)
+        self.getInfoSrv = self.create_service(Robotiq2FInfo, "/gripper_info", info_callback)
+
         self.timer = self.create_timer(0.01, self.gripper_state_handle)
         self.gjsPub = self.create_publisher(JointState, "/joint_states", 10)
 
@@ -43,11 +53,32 @@ class RobotiqHandEServer(Node):
         self.get_logger().info(f"Grip Velo  : [0.020, 0.150] (m/s)")
         self.get_logger().info(f"Grip Force : [60.0, 130.0] (N)")
 
+        self._fake_req_pos = 0.0
+
     def close_connection(self):
-        self.gripper.shutdown()
+        if not self.use_fake_hardware:
+            self.gripper.shutdown()
         self.get_logger().info(bcolors.OKGREEN + "Gripper connection is disconnected" + bcolors.ENDC)
 
-    def get_info_cb(self, request, response):
+    def server_callback(self, request, response):
+        self.get_logger().info(f"Request Gripper Width : [{request.pos}] (m)")
+        self.get_logger().info(f"Request Gripper Velo  : [{request.vel}] (m/s)")
+        self.get_logger().info(f"Request Gripper Force : [{request.force}] (N)")
+        self.gripper.goto(pos=request.pos, vel=request.vel, force=request.force)
+        response.success = True
+        response.message = "Request SUCCESSFUL"
+        return response
+
+    def server_fake_callback(self, request, response):
+        self.get_logger().info(f"Request Gripper Width : [{request.pos}] (m)")
+        self.get_logger().info(f"Request Gripper Velo  : [{request.vel}] (m/s)")
+        self.get_logger().info(f"Request Gripper Force : [{request.force}] (N)")
+        self._fake_req_pos = request.pos
+        response.success = True
+        response.message = "Request SUCCESSFUL"
+        return response
+
+    def info_callback(self, request, response):
         response.is_ready = self.gripper.is_ready()
         response.is_reset = self.gripper.is_reset()
         response.is_moving = self.gripper.is_moving()
@@ -59,13 +90,28 @@ class RobotiqHandEServer(Node):
         response.get_current = self.gripper.get_current()
         return response
 
-    def cmd_cb(self, request, response):
-        self.get_logger().info(f"Request Gripper Width : [{request.pos}] (m)")
-        self.get_logger().info(f"Request Gripper Velo  : [{request.vel}] (m/s)")
-        self.get_logger().info(f"Request Gripper Force : [{request.force}] (N)")
-        self.gripper.goto(pos=request.pos, vel=request.vel, force=request.force)
-        response.success = True
-        response.message = "Request SUCCESSFUL"
+    def info_callback(self, request, response):
+        response.is_ready = self.gripper.is_ready()
+        response.is_reset = self.gripper.is_reset()
+        response.is_moving = self.gripper.is_moving()
+        response.is_stopped = self.gripper.is_stopped()
+        response.object_detected = self.gripper.object_detected()
+        response.get_fault_status = self.gripper.get_fault_status()
+        response.get_pos = self.gripper.get_pos()
+        response.get_req_pos = self.gripper.get_req_pos()
+        response.get_current = self.gripper.get_current()
+        return response
+
+    def info_fake_callback(self, request, response):
+        response.is_ready = True
+        response.is_reset = True
+        response.is_moving = False
+        response.is_stopped = True
+        response.object_detected = False
+        response.get_fault_status = 0
+        response.get_pos = self._fake_req_pos
+        response.get_req_pos = self._fake_req_pos
+        response.get_current = 0.0
         return response
 
     def joint_from_pos(self, pos):
@@ -75,26 +121,17 @@ class RobotiqHandEServer(Node):
         time = self.get_clock().now().to_msg()
         pos = self.gripper.get_pos()
 
+        if not self.use_fake_hardware:
+            pos = self.gripper.get_pos()
+        else:
+            pos = self._fake_req_pos
+
         js = JointState()
         js.header.frame_id = ""
         js.header.stamp = time
         js.name = ["hande_joint_finger"]
         js.position = [self.joint_from_pos(pos)]
         self.gjsPub.publish(js)
-
-        t = TransformStamped()
-        t.header.stamp = time
-        t.header.frame_id = "gripper_adapter_link"
-        t.child_frame_id = "tcp"
-        t.transform.translation.x = 0.0
-        t.transform.translation.y = 0.0
-        t.transform.translation.z = 0.146
-        t.transform.rotation.x = 0.0
-        t.transform.rotation.y = 0.0
-        t.transform.rotation.z = 0.0
-        t.transform.rotation.w = 1.0
-
-        self.tfbroadcaster.sendTransform(t)
 
 
 def main(args=None):

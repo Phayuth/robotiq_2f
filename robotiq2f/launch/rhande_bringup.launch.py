@@ -8,6 +8,11 @@ def generate_launch_description():
         executable="robotiqhande_service",
         name="robotiq_hande_node",
         output="screen",
+        parameters=[
+            {"comport": "/dev/ttyUSB0"},
+            {"baud": 115200},
+            {"use_fake_hardware": True},
+        ],
     )
 
     return LaunchDescription([gripper_node])
